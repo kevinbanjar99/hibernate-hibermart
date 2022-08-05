@@ -3,6 +3,8 @@ package com.danamon.hibermart.dao;
 import com.danamon.hibermart.config.HibernateConfig;
 import com.danamon.hibermart.model.Product;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Order;
 import org.hibernate.query.Query;
 
 import java.util.List;
@@ -53,29 +55,29 @@ public class ProductDao {
         }
     }
 
-
     public Product getProductByID(int id) {
+        Product product = null;
         try {
-            Query query = session.createQuery("FROM Product WHERE id=:id");
-            query.setParameter("id", id);
-            return (Product) query.uniqueResult();
+            product = session.get(Product.class,id);
         } catch (Exception e) {
             System.out.println(e.getMessage());
         } finally {
             session.close();
         }
-        return null;
+        return product;
     }
 
-    public List<Product> getAllProduct() {
+    public List getAllProduct() {
+        List<Product> list = null;
         try {
-            return session.createQuery("FROM Product", Product.class).list();
+            //return session.createQuery("FROM Product", Product.class).list();
+            list = session.createCriteria(Product.class).addOrder(Order.asc("id")).list();
         } catch (Exception e) {
             System.out.println(e.getMessage());
         } finally {
             session.close();
         }
-        return null;
+        return list;
     }
 
     public void updateProductID(int targetID, int newID){
@@ -92,16 +94,17 @@ public class ProductDao {
     }
 
     public Object getProductPrice(int targetID){
+        Object selectCustom = null;
         try {
             Query q=session.createQuery("select name,productPrice from Product where id=:id");
             q.setParameter("id",targetID);
-            return q.getSingleResult();
+            selectCustom = q.getSingleResult();
         } catch (Exception e) {
             System.out.println(e.getMessage());
         } finally {
             session.close();
         }
-        return null;
+        return selectCustom;
     }
 }
 
